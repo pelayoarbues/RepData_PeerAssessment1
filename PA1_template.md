@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 This assignment makes use of data from a personal activity monitoring
 device. This device collects data at 5 minute intervals through out the
@@ -25,15 +20,16 @@ the following variables:
 
 ### Loading and preprocessing the data
 
-```{r, results='hide', message=FALSE, warning=FALSE}
+
+```r
 library(data.table)
 library(dplyr)
 library(ggplot2) #load ggplot2
 ```
 
 
-```{r, echo=TRUE}
 
+```r
 setwd("/Users/pelayogonzalez/Desktop/Coursera/Reproducible_research/RepData_PeerAssessment1")
 dt <- data.table(read.csv("activity.csv")) #Load as data.table
 ```
@@ -41,7 +37,8 @@ dt <- data.table(read.csv("activity.csv")) #Load as data.table
 ### What is mean total number of steps taken per day?
 
 First let's plot the total number of steps taken each day.
-```{r, echo=TRUE}
+
+```r
 #Create new dt where steps are aggregated by day using dplyr
 dt.by_day <- 
         dt %>% 
@@ -57,16 +54,22 @@ med.steps.byday <- median(dt.by_day$steps_tot) #Compute median total number step
 p1 <- ggplot(dt.by_day, aes(x = steps_tot)) #create plot
 p1 +  geom_histogram(binwidth = 5000, origin = 0) + #format histogram
   labs(x = "Steps", y= "Count of days")
+```
+
+![plot of chunk unnamed-chunk-3](./PA1_template_files/figure-html/unnamed-chunk-3.png) 
+
+```r
 # ggsave(file = "./instructions_fig/p1.png")
 ```
 
-The mean and median total number of steps taken per day are `r avg.steps.byday` and `r med.steps.byday`, respectively.
+The mean and median total number of steps taken per day are 1.0766 &times; 10<sup>4</sup> and 10765, respectively.
 
 
 ### What is the average daily activity pattern?
 
 
-```{r, echo=TRUE}
+
+```r
 #Create new dt where steps are aggregated by interval using dplyr
 dt.by_interval <- 
         dt %>% 
@@ -78,17 +81,22 @@ dt.by_interval <-
 p2 <- ggplot(dt.by_interval, aes(x = interval, y = steps_avg)) #create plot
 p2 +  geom_line() + #format histogram 
   labs(x = "Interval", y= "Average number of steps taken")
+```
 
+![plot of chunk unnamed-chunk-4](./PA1_template_files/figure-html/unnamed-chunk-4.png) 
+
+```r
 #Find interval with highest number of steps
 max.steps <- dt.by_interval[which.max(dt.by_interval$steps_avg),] #Find row with maximum
 highest.int <- max.steps[1,interval] #Extract value of interval
 ```
 
-The maximum number of steps, on average across all days on dataset, is contained in interval `r highest.int`.
+The maximum number of steps, on average across all days on dataset, is contained in interval 835.
 
 ### Imputing missing values
 
-```{r, echo=TRUE}
+
+```r
 #Compute number of missing values
 missing <- length(which(is.na(dt))) 
 #Create a new dt where missing will be replaced
@@ -102,7 +110,8 @@ Missing values in the `steps` variable are replaced by the mean for the 5 minute
 
 
 
-```{r, echo=TRUE}
+
+```r
 #Create new dt where steps are aggregated by day using dplyr
 dt.nomis.by_day <- 
         dt.nomis %>% 
@@ -121,11 +130,14 @@ p3 +  geom_histogram(binwidth = 5000, origin = 0) + #format histogram
   labs(x = "Steps", y= "Count of days")
 ```
 
-In the transformed database where missing values where replaced, the mean and median total number of steps taken per day are `r avg.steps.nomis.byday` and `r med.steps.nomis.byday`. In this case differences in mean and median between the original database and the one where NAs were removed are `r diff.mean` and `r diff.med`, respectively. Mean remains unchanged and there is a small difference in media. 
+![plot of chunk unnamed-chunk-6](./PA1_template_files/figure-html/unnamed-chunk-6.png) 
+
+In the transformed database where missing values where replaced, the mean and median total number of steps taken per day are 1.0766 &times; 10<sup>4</sup> and 1.0766 &times; 10<sup>4</sup>. In this case differences in mean and median between the original database and the one where NAs were removed are 0 and -1.1887, respectively. Mean remains unchanged and there is a small difference in media. 
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
-```{r, echo=TRUE}
+
+```r
 #Manipulate data to create a factor
 dt.nomis$dow <- as.factor(weekdays(as.Date(dt$date))) #Obtain days of week
 #Transform dow to another factor variable that takes two values
@@ -140,6 +152,8 @@ p4 +  geom_line() + #format histogram
         facet_grid(day ~ .) +
   labs(x = "Interval", y= "Average number of steps taken") 
 ```
+
+![plot of chunk unnamed-chunk-7](./PA1_template_files/figure-html/unnamed-chunk-7.png) 
 
 According to the plot the number of steps taken between interval 500 and 750 are larger, on average, during weekdays. It seems that the person under study walks more steps in the interval from 750 to 1750.
 
